@@ -23,12 +23,12 @@ print('Test: %d' % len(test_set.image_ids))
 # build model and load weights
 cfg = objd.PredictionConfig()
 model = objd.MaskRCNN(mode='inference', model_dir='./', config=cfg)
-model.load_weights('plans_cfg20191211T1049/mask_rcnn_plans_cfg_0001.h5', by_name=True)
+model.load_weights('plans_cfg20191211T1644/mask_rcnn_plans_cfg_0001.h5', by_name=True)
 
 #------------------------
 # evaluate model using mAP on training and test sets
 print("Calculating mAP metrics...")
-train_mAP = evaluate_model(train_set, model, cfg)
+train_mAP = objd.evaluate_model(train_set, model, cfg)
 print("Train mAP: %.3f" % train_mAP)
 
 # evaluate model on test dataset
@@ -38,5 +38,5 @@ print("Calculated mAP metrics.")
 
 #------------------------
 # Produce plots for predictions for training and test set
-objd.plot_actual_vs_predicted(train_set, model, cfg)
-objd.plot_actual_vs_predicted(test_set, model, cfg)
+objd.plot_actual_vs_predicted(train_set, model, cfg, 3)
+objd.plot_actual_vs_predicted(test_set, model, cfg, 3)

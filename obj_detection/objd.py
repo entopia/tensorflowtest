@@ -104,7 +104,7 @@ class PlansDataset(Dataset):
 class PlansConfig(Config):
 	NAME = "plans_cfg"
 	NUM_CLASSES = 3 + 1 # Number of classes (background + ?)
-	STEPS_PER_EPOCH = 131
+	STEPS_PER_EPOCH = 10
         
 # Configuration file for evaluation
 class PredictionConfig(Config):
@@ -132,7 +132,7 @@ def evaluate_model(dataset, model, cfg):
 	mAP = mean(APs)
 	return mAP
 
-def plot_actual_vs_predicted(dataset, model, cfg, n_images=5):
+def plot_actual_vs_predicted(dataset, model, cfg, n_images):
 	"""
 	Plot a number of photos with ground truth and predictions
 	"""
@@ -146,10 +146,8 @@ def plot_actual_vs_predicted(dataset, model, cfg, n_images=5):
 		pyplot.subplot(n_images, 2, i*2+1)
 		pyplot.imshow(image)
 		pyplot.title('Actual')
+                pyplot.imshow(np.any(mask, axis=2), cmap='gray', alpha=0.3)
                 
-		for j in range(mask.shape[2]):
-			pyplot.imshow(mask[:, :, j], cmap='gray', alpha=0.3)
-
 		pyplot.subplot(n_images, 2, i*2+2)
 		pyplot.imshow(image)
 		pyplot.title('Predicted')
