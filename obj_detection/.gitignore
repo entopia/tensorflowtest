@@ -1,3 +1,5 @@
 kangaroo*
+plans*
 __pycache__/*
 .DS_Store
+mask_rcnn_coco.h5
