@@ -1,11 +1,17 @@
-# split into train and test set
 from os import listdir
 from xml.etree import ElementTree
 from numpy import zeros
 from numpy import asarray
-from mrcnn.utils import Dataset
+from numpy import expand_dims
+from numpy import mean
+from matplotlib import pyplot
+from matplotlib.patches import Rectangle
 from mrcnn.config import Config
 from mrcnn.model import MaskRCNN
+from mrcnn.utils import Dataset
+from mrcnn.utils import compute_ap
+from mrcnn.model import load_image_gt
+from mrcnn.model import mold_image
 
 # class that defines and loads the kangaroo dataset
 class KangarooDataset(Dataset):
@@ -33,7 +39,7 @@ class KangarooDataset(Dataset):
 			ann_path = annotations_dir + image_id + '.xml'
 			# add to dataset
 			self.add_image('dataset', image_id=image_id, path=img_path, annotation=ann_path)
- 
+
 	# extract bounding boxes from an annotation file
 	def extract_boxes(self, filename):
 		# load and parse the file
@@ -53,7 +59,7 @@ class KangarooDataset(Dataset):
 		width = int(root.find('.//size/width').text)
 		height = int(root.find('.//size/height').text)
 		return boxes, width, height
- 
+
 	# load the masks for an image
 	def load_mask(self, image_id):
 		# get details of image
@@ -73,35 +79,28 @@ class KangarooDataset(Dataset):
 			masks[row_s:row_e, col_s:col_e, i] = 1
 			class_ids.append(self.class_names.index('kangaroo'))
 		return masks, asarray(class_ids, dtype='int32')
- 
+
 	# load an image reference
 	def image_reference(self, image_id):
 		info = self.image_info[image_id]
 		return info['path']
 
-# define a configuration for the model
-class KangarooConfig(Config):
-	# define the name of the configuration
-	NAME = "kangaroo_cfg"
-	# number of classes (background + kangaroo)
-	NUM_CLASSES = 1 + 1
-	# number of training steps per epoch
-	STEPS_PER_EPOCH = 131
-
+# define the prediction configuration
 class PredictionConfig(Config):
 	# define the name of the configuration
 	NAME = "kangaroo_cfg"
 	# number of classes (background + kangaroo)
 	NUM_CLASSES = 1 + 1
 	# simplify GPU config
-	GPU_COUNT = 0
-	IMAGES_PER_GPU = 0
+	GPU_COUNT = 1
+	IMAGES_PER_GPU = 1
 
 # calculate the mAP for a model on a given dataset
 def evaluate_model(dataset, model, cfg):
 	APs = list()
 	for image_id in dataset.image_ids:
-		# load image, bounding boxes and masks for the image id
+
+                # load image, bounding boxes and masks for the image id
 		image, image_meta, gt_class_id, gt_bbox, gt_mask = load_image_gt(dataset, cfg, image_id, use_mini_mask=False)
 		# convert pixel values (e.g. center)
 		scaled_image = mold_image(image, cfg)
@@ -118,7 +117,7 @@ def evaluate_model(dataset, model, cfg):
 	# calculate the mean AP across all images
 	mAP = mean(APs)
 	return mAP
-        
+
 # plot a number of photos with ground truth and predictions
 def plot_actual_vs_predicted(dataset, model, cfg, n_images=5):
 	# load image and mask
@@ -157,4 +156,4 @@ def plot_actual_vs_predicted(dataset, model, cfg, n_images=5):
 			# draw the box
 			ax.add_patch(rect)
 	# show the figure
-	pyplot.show()        
+	pyplot.show()
