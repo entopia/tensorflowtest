@@ -85,6 +85,15 @@ class KangarooDataset(Dataset):
 		info = self.image_info[image_id]
 		return info['path']
 
+# define a configuration for the model
+class KangarooConfig(Config):
+	# Give the configuration a recognizable name
+	NAME = "kangaroo_cfg"
+	# Number of classes (background + kangaroo)
+	NUM_CLASSES = 1 + 1
+	# Number of training steps per epoch
+	STEPS_PER_EPOCH = 131
+        
 # define the prediction configuration
 class PredictionConfig(Config):
 	# define the name of the configuration
