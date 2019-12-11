@@ -1,19 +1,19 @@
 import objd
 
 # train set
-train_set = objd.KangarooDataset()
-train_set.load_dataset('kangaroo', is_train=True)
+train_set = objd.PlansDataset()
+train_set.load_dataset('plans', is_train=True)
 train_set.prepare()
 print('Train examples: %d' % len(train_set.image_ids))
  
 # test/val set
-test_set = objd.KangarooDataset()
-test_set.load_dataset('kangaroo', is_train=False)
+test_set = objd.PlansDataset()
+test_set.load_dataset('plans', is_train=False)
 test_set.prepare()
 print('Test examples: %d' % len(test_set.image_ids))
 
 # prepare config
-config = objd.KangarooConfig()
+config = objd.PlansConfig()
 config.display()
 
 # define the model

@@ -13,12 +13,11 @@ from mrcnn.utils import compute_ap
 from mrcnn.model import load_image_gt
 from mrcnn.model import mold_image
 
-# class that defines and loads the kangaroo dataset
-class KangarooDataset(Dataset):
+class PlansDataset(Dataset):
 	# load the dataset definitions
 	def load_dataset(self, dataset_dir, is_train=True):
 		# define one class
-		self.add_class("dataset", 1, "kangaroo")
+		self.add_class("dataset", 1, "plans")
 		# define data locations
 		images_dir = dataset_dir + '/images/'
 		annotations_dir = dataset_dir + '/annots/'
@@ -86,9 +85,9 @@ class KangarooDataset(Dataset):
 		return info['path']
 
 # define a configuration for the model
-class KangarooConfig(Config):
+class PlansConfig(Config):
 	# Give the configuration a recognizable name
-	NAME = "kangaroo_cfg"
+	NAME = "plans_cfg"
 	# Number of classes (background + kangaroo)
 	NUM_CLASSES = 1 + 1
 	# Number of training steps per epoch
@@ -97,7 +96,7 @@ class KangarooConfig(Config):
 # define the prediction configuration
 class PredictionConfig(Config):
 	# define the name of the configuration
-	NAME = "kangaroo_cfg"
+	NAME = "plans_cfg"
 	# number of classes (background + kangaroo)
 	NUM_CLASSES = 1 + 1
 	# simplify GPU config
