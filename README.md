@@ -10,8 +10,9 @@ https://machinelearningmastery.com/how-to-train-an-object-detection-model-with-k
 ## Mask-RCNN repo
 https://github.com/matterport/Mask_RCNN
 
-## Kangaroo dataset
-https://github.com/experiencor/kangaroo.git
+## Dataset
+The dataset class on this branch has been adapted to detecting objects in
+planning applcation. No public dataset is referenced here.
 
 ## Setup
 
@@ -22,14 +23,6 @@ git clone https://github.com/matterport/Mask_RCNN.git
 cd Mask_RCNN
 python setup.py install
 pip show mask-rcnn
-```
-If testing the kangaroo dataset, clone the following and put the `kangaroo` folder inside `obj_detection`:
-```
-git clone https://github.com/experiencor/kangaroo.git
-```
-
-And finally,
-```
 pip install keras
 pip install scikit-image
 ```
