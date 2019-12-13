@@ -1,12 +1,15 @@
+import time
+import os
 from os import listdir
 from os import path
 from xml.etree import ElementTree
+import numpy as np
 from numpy import zeros
 from numpy import asarray
 from numpy import expand_dims
 from numpy import mean
 from matplotlib import pyplot
-from matplotlib.patches import Rectangle
+import matplotlib.patches
 from mrcnn.config import Config
 from mrcnn.model import MaskRCNN
 from mrcnn.utils import Dataset
@@ -25,6 +28,9 @@ The code in this file is largely refactored from the following tutorial:
 https://machinelearningmastery.com/how-to-train-an-object-detection-model-with-keras/
 
 """
+
+COLOURS = {0:"black", 1:"magenta", 2:"green", 3:"steelblue"}
+CLASS_ID_TO_NAME = {0:"background", 1:"drawing", 2:"drawingtitle", 3:"blocktitle"}
 
 class PlansDataset(Dataset):
 
@@ -136,25 +142,34 @@ def plot_actual_vs_predicted(dataset, model, cfg, n_images):
 	"""
 	Plot a number of photos with ground truth and predictions
 	"""
-	for i in range(n_images):
-		image = dataset.load_image(i)
-		mask, _ = dataset.load_mask(i)
-		scaled_image = mold_image(image, cfg) # convert pixel values (e.g. center)
-		sample = expand_dims(scaled_image, 0) # convert image into one sample
+	for j in range(n_images):
 
-		yhat = model.detect(sample, verbose=0)[0]
-		pyplot.subplot(n_images, 2, i*2+1)
-		pyplot.imshow(image)
-		pyplot.title('Actual')
-                pyplot.imshow(np.any(mask, axis=2), cmap='gray', alpha=0.3)
+                image = dataset.load_image(j)
+                mask, _ = dataset.load_mask(j)
+                scaled_image = mold_image(image, cfg) # convert pixel values (e.g. center)
+                sample = expand_dims(scaled_image, 0) # convert image into one sample
                 
-		pyplot.subplot(n_images, 2, i*2+2)
-		pyplot.imshow(image)
-		pyplot.title('Predicted')
-		ax = pyplot.gca()
-		for box in yhat['rois']:
-			y1, x1, y2, x2 = box
-			width, height = x2 - x1, y2 - y1
-			rect = Rectangle((x1, y1), width, height, fill=False, color='red')
-			ax.add_patch(rect)
-	pyplot.show()
+                fig = pyplot.figure(figsize=(20,20))
+                yhat = model.detect(sample, verbose=0)[0]
+                pyplot.subplot(1, 2, 1)
+                pyplot.imshow(image)
+                pyplot.title('Actual', fontsize=24)
+                pyplot.axis('off')
+                pyplot.imshow(np.any(mask, axis=2), cmap='gray', alpha=0.3)
+                pyplot.subplot(1, 2, 2)
+                pyplot.imshow(image)
+                pyplot.title('Predicted', fontsize=24)
+                ax = pyplot.gca()
+                for i, box in enumerate(yhat['rois']):
+                        y1, x1, y2, x2 = box
+                        width, height = x2 - x1, y2 - y1
+                        rect = matplotlib.patches.Rectangle((x1, y1), width, height, fill=False, color=COLOURS[yhat["class_ids"][i]])
+                        ax.add_patch(rect)
+                
+                pyplot.tight_layout()
+                pyplot.axis('off')
+                handles = [matplotlib.patches.Patch(color=COLOURS[i], label=CLASS_ID_TO_NAME[i]) for i in COLOURS.keys()]
+                pyplot.legend(handles=handles, loc="lower right", prop={'size': 18})
+
+                os.makedirs("predicted_images", exist_ok=True)
+                pyplot.savefig("predicted_images/{}_{}.png".format(j, time.time()), dpi=500, bbox_inches = 'tight')
